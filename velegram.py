@@ -112,6 +112,7 @@ thread1=threading.Thread(target=sendMessageMode)
 thread2=threading.Thread(target=scannerMode)
 thread1.deamon=True
 thread2.deamon=True
+print('Start')
 thread1.start()
 thread2.start()
 

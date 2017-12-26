@@ -10,6 +10,7 @@ print('Velegram alpha 0.0.1')
 login='kryuchkov2001@mail.ru'#input('login: ')
 password='05032001dobropozalovat'#input('password: ')
 n=10**200
+i=0
 
 vk=vk_api.VkApi(login=login, password=password)
 vk.auth()
@@ -18,12 +19,17 @@ vk=vk_api.VkApi.get_api(vk)
 id=vk.users.get()[0]['id']
 
 
-Hint=input("Введите имя или фамилию, или и то и другое того, кому вы хотите отправить сообщение:  ")
-frlist=vk.friends.search(q=Hint, count=10)
-for i in range(int(frlist['count'])):
-    print(str(i) +": " + frlist['items'][i]['first_name'] + " " + frlist['items'][i]['last_name'])
-index=input("CHOOSE YOUR DESTINY: ")
-frid=frlist['items'][int(index)]['id']
+while i==0:
+    Hint=input("Введите имя или фамилию, или и то и другое того, кому вы хотите отправить сообщение:  ")
+    frlist=vk.friends.search(q=Hint, count=10)
+    for i in range(int(frlist['count'])):
+        print(str(i) +": " + frlist['items'][i]['first_name'] + " " + frlist['items'][i]['last_name'])
+    if int(frlist['count'])>0:
+        index=input("CHOOSE YOUR DESTINY: ")
+        frid=frlist['items'][int(index)]['id']
+        i+=1
+    else:
+        print('Ваш запрос не дал результатов, попробуйте еще раз')
 
 
 def messageToNumber():
@@ -112,6 +118,7 @@ thread1=threading.Thread(target=sendMessageMode)
 thread2=threading.Thread(target=scannerMode)
 thread1.deamon=True
 thread2.deamon=True
+print('Start')
 thread1.start()
 thread2.start()
 

@@ -115,8 +115,10 @@ def getKey(FPK=None):
 
 def sendMessage():
     crypt=messageToNumber()
-    cryptMsg= int(crypt[1]) ^ getKey()
-    vk.messages.send(user_id=frid, message=str(id) + ' ' + str(crypt[0]) + ' ' + str(cryptMsg))
+    Krey=getKey()
+    if Krey!=0:
+        cryptMsg= int(crypt[1]) ^ Krey
+        vk.messages.send(user_id=frid, message=str(id) + ' ' + str(crypt[0]) + ' ' + str(cryptMsg))
 
 
 def messageScanner():

@@ -5,9 +5,14 @@ import time
 import shutil
 import os
 import re
+import sqlite3
 
 
 print('Velegram alpha 0.0.1')
+
+conn = sqlite3.connect('keysDATA.sqlite')
+c=conn.cursor()
+c.execute('''CREATE TABLE IF NOT EXISTS users (id int primary key,key varchar) ''')
 
 
 path='C:/Users/User/Desktop/Velegram.lnk'
@@ -16,8 +21,7 @@ if not os.path.isfile(path):
     target = re.sub('\\\\', '/', target)
     shutil.copy(target, path)
     print('Программа создала ярлык на рабочем столе')
-    time.sleep(4)
-    print('Что? Он вам не нужен?Да мы *** клали на ваше мнение, я здеся царь бог, пока вы не удалите эту программу ваххахахахахах')
+
 
 login=input('login: ')
 password=input('password: ')
@@ -46,6 +50,16 @@ while i==0:
         print('Ваш запрос не дал результатов, попробуйте еще раз')
 
 
+def add_key(id, key):
+    c.execute("SELECT * FROM users WHERE id='%s'"%(id))
+    r=c.fetchone()
+    if r is None:
+        c.execute("INSERT INTO users (id, key)  VALUES ('%s','%s')"%(id, key))
+    else:
+        c.execute("UPDATE users SET key='%s' WHERE id='%s'"%(key, id))
+    conn.commit()
+
+
 def messageToNumber():
     flag=0
     while flag==0:
@@ -71,20 +85,31 @@ def keyScanner():
     return frPubKey[1]
 
 
-def getKey(FPK=None):  #надо сделать и статический pubkey чтобы отправлять сообщения даже когда человек оффлайн
-    Hash=random.getrandbits(12)        #но тогда надо сделать таблицу в которую будут сохраняться пабкии    сделать функцию которая при каждой "встрече" создает                                        новый статический пабкии
+def getKey(FPK=None):
+    Hash=random.getrandbits(12)
     PubKey=3**Hash%n
     Key=13
-    FrPubKey=13                                   #сохранять последний пабкии в таблицу
-    while Key!=int(FrPubKey)**Hash%n:
-        if FPK==None:
-            vk.messages.send(user_id=frid, message='!*@&#^$%' + ' ' + str(PubKey))
-            FrPubKey=int(keyScanner())
-            Key=FrPubKey**Hash%n
+    FrPubKey=13
+    if vk.users.get(user_ids=frid, fields='online')[0]['online']==1:
+        while Key!=int(FrPubKey)**Hash%n:
+            if FPK==None:
+                vk.messages.send(user_id=frid, message='!*@&#^$%' + ' ' + str(PubKey))
+                FrPubKey=int(keyScanner())
+                Key=FrPubKey**Hash%n
+                add_key(frid, Key)
+            else:
+                FrPubKey=int(FPK)
+                vk.messages.send(user_id=frid, message='!*@&#^$%' + ' ' + str(PubKey))
+                Key = FrPubKey ** Hash % n
+                add_key(frid, Key)
+    else:
+        c.execute("SELECT key FROM users WHERE id='%s'"%(str(frid)))
+        Key = c.fetchone()[0]
+        if Key is not None:
+            Key=int(Key)
         else:
-            FrPubKey=int(FPK)
-            vk.messages.send(user_id=frid, message='!*@&#^$%' + ' ' + str(PubKey))
-            Key = FrPubKey ** Hash % n
+            print('Ключ не был до сих пор создан, поэтому отправка собщений, пока человек оффлайн невозможна')
+            Key=0
     return Key
 
 

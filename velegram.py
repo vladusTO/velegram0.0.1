@@ -15,7 +15,7 @@ c=conn.cursor()
 c.execute('''CREATE TABLE IF NOT EXISTS users (id int primary key,key varchar) ''')
 
 
-path='C:/Users/User/Desktop/Velegram.lnk'
+path='C:/Users/' + os.getlogin() + '/Desktop/Velegram.lnk'
 if not os.path.isfile(path):
     target=os.path.abspath('velegramicon.lnk')
     target = re.sub('\\\\', '/', target)

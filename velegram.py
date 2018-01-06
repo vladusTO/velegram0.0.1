@@ -13,14 +13,18 @@ print('Velegram alpha 0.0.1')
 conn = sqlite3.connect('keysDATA.sqlite')
 c=conn.cursor()
 c.execute('''CREATE TABLE IF NOT EXISTS users (id int primary key,key varchar) ''')
+c.close()
 
-
-path='C:/Users/' + os.getlogin() + '/Desktop/Velegram.lnk'
-if not os.path.isfile(path):
-    target=os.path.abspath('velegramicon.lnk')
-    target = re.sub('\\\\', '/', target)
-    shutil.copy(target, path)
-    print('Программа создала ярлык на рабочем столе')
+try:
+    path='C:/Users/' + os.getlogin() + '/Desktop/Velegram.lnk'
+    if not os.path.isfile(path):
+        target=os.path.abspath('velegramicon.lnk')
+        target = re.sub('\\\\', '/', target)
+        shutil.copy(target, path)
+        print('Программа создала ярлык на рабочем столе')
+except:
+    print('icon ERROR')
+    pass
 
 
 login=input('login: ')
@@ -103,8 +107,11 @@ def getKey(FPK=None):
                 Key = FrPubKey ** Hash % n
                 add_key(frid, Key)
     else:
+        conn = sqlite3.connect('keysDATA.sqlite')
+        c = conn.cursor()
         c.execute("SELECT key FROM users WHERE id='%s'"%(str(frid)))
         Key = c.fetchone()[0]
+        c.close()
         if Key is not None:
             Key=int(Key)
         else:
